@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.ResponseCompression;
 using N8.Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -5,6 +6,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+
+builder.Services.AddResponseCompression(opts =>
+{
+    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(["application/octet-stream"]);
+});
 
 var app = builder.Build();
 
@@ -16,9 +23,19 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseResponseCompression();
 app.UseHttpsRedirection();
 
-app.UseStaticFiles();
+var cacheMaxAgeOneWeek = (60 * 60 * 24 * 7).ToString();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append(
+             "Cache-Control", $"public, max-age={cacheMaxAgeOneWeek}");
+    }
+});
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()

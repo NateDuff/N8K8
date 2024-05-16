@@ -1,20 +1,52 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@inject IConfiguration Configuration
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#104fff" />
     <base href="/" />
-    <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
-    <link rel="stylesheet" href="app.css" />
-    <link rel="stylesheet" href="N8.Web.styles.css" />
-    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="stylesheet" href="css/app.min.css?version=@version" />
+    <link rel="icon" type="image/svg" href="logo.svg" />
     <HeadOutlet />
 </head>
 
 <body>
     <Routes />
-    <script src="_framework/blazor.web.js"></script>
+    <script src="_framework/blazor.web.js?version=@version" autostart="false"></script>
+    <script lang="javascript">
+        Blazor.start({
+            ssr: { disableDomPreservation: true },
+            circuit: {
+                reconnectionOptions: {
+                    maxRetries: 100, retryIntervalMilliseconds: 500
+                }
+            }
+        })
+        
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(function(registration) {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                })
+                .catch(function(error) {
+                    console.error('Service Worker registration failed:', error);
+            });
+        } else {
+            console.error('Service Worker is not supported in this browser.');
+        }
+    </script>
 </body>
 
 </html>
+
+@code {
+    string version = "0.0.0";
+
+    protected override void OnInitialized()
+    {
+        version = Configuration["AppVersion"];
+    }
+}

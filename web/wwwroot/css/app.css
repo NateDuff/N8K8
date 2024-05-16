@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: "OneStream Sans";
+    src: url("../fonts/OneStreamSans-Regular.otf") format("opentype");
+}
+
+@font-face {
+    font-family: "OneStream Sans";
+    font-weight: bold;
+    src: url("../fonts/OneStreamSans-Black.otf") format("opentype");
+}
+
+:root {
+    --highlight-color: #00985B;
+}
+
+h1:focus {
+    outline: none;
+}
+
+
+::selection {
+    background: var(--highlight-color);
+    color: white;
+}
+
+::-moz-selection {
+    background: var(--highlight-color);
+    color: white;
+}
+
+@layer base {
+    html {
+        font-family: "OneStream Sans", serif;
+        scroll-padding-top: 3rem;
+    }
+
+    h1, h2, h3, .styled-button {
+        font-family: "OneStream Sans", serif;
+        font-optical-sizing: auto;
+        font-weight: 500;
+        font-style: normal;
+    }
+}
