@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "N8.Shared", "shared\N8.Shar
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "N8.Worker", "worker\N8.Worker.csproj", "{22E775B9-9DE9-46C4-8322-4B26ECDBDFB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "N8.Job", "job\N8.Job.csproj", "{F779AB85-D7E3-4880-B5EC-1DAA80EE2409}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "N8.Job", "job\N8.Job.csproj", "{F779AB85-D7E3-4880-B5EC-1DAA80EE2409}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -545,6 +545,9 @@ video {
 .col-span-2 {
   grid-column: span 2 / span 2;
 }
+.col-span-1 {
+  grid-column: span 1 / span 1;
+}
 .-m-1 {
   margin: -0.25rem;
 }
@@ -602,6 +605,9 @@ video {
 .h-96 {
   height: 24rem;
 }
+.max-h-72 {
+  max-height: 18rem;
+}
 .w-6 {
   width: 1.5rem;
 }
@@ -653,6 +659,9 @@ video {
 }
 .divide-gray-500\/10 > :not([hidden]) ~ :not([hidden]) {
   border-color: rgb(107 114 128 / 0.1);
+}
+.overflow-auto {
+  overflow: auto;
 }
 .overflow-y-auto {
   overflow-y: auto;
@@ -799,6 +808,10 @@ video {
   --tw-text-opacity: 1;
   color: rgb(0 152 91 / var(--tw-text-opacity));
 }
+.text-osPurple-400 {
+  --tw-text-opacity: 1;
+  color: rgb(110 38 193 / var(--tw-text-opacity));
+}
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
@@ -843,6 +856,16 @@ h1:focus {
 ::-moz-selection {
     background: var(--highlight-color);
     color: white;
+}
+
+.odd\:text-osBlue-400:nth-child(odd) {
+  --tw-text-opacity: 1;
+  color: rgb(85 100 255 / var(--tw-text-opacity));
+}
+
+.even\:text-osPurple-400:nth-child(even) {
+  --tw-text-opacity: 1;
+  color: rgb(110 38 193 / var(--tw-text-opacity));
 }
 
 .hover\:bg-gray-50:hover {
@@ -894,6 +917,10 @@ h1:focus {
 }
 
 @media (min-width: 768px) {
+
+  .md\:col-span-2 {
+    grid-column: span 2 / span 2;
+  }
 
   .md\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));

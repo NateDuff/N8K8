@@ -27,6 +27,9 @@ module.exports = {
                 osBlue: {
                     400: '#5564FF'
                 },
+                osPurple: {
+                    400: '#6E26C1'
+                },
             }
         }
     },

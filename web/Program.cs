@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.ResponseCompression;
+using N8.Shared.Messaging;
 using N8.Web.Components;
+using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,18 @@ builder.Services.AddHttpClient("API", client =>
     client.BaseAddress = new Uri(builder.Configuration["ApiEndpoint"]);
 });
 
+builder.Services.AddSingleton<IConnectionFactory>(sp =>
+{
+    return new ConnectionFactory()
+    {
+        HostName = "rabbitmq-service",
+        UserName = "guest",
+        Password = "guest"
+    };
+});
+
+builder.Services.AddSingleton<MessageQueueService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -26,6 +40,8 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.UseDeveloperExceptionPage();
 
 app.UseResponseCompression();
 app.UseHttpsRedirection();

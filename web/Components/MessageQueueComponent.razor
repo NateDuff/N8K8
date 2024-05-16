@@ -1,0 +1,35 @@
+﻿@using N8.Shared.Messaging
+
+@inject MessageQueueService MessageQueueService
+
+<h2 class="text-3xl font-bold tracking-tight text-center sm:text-6xl text-osPurple-400">Messages from RabbitMQ Queue</h2>
+
+<ul class="pl-8 max-h-72 overflow-auto">
+    @foreach (var message in messages)
+    {
+        <li class="odd:text-osBlue-400">@message</li>
+    }
+</ul>
+
+@code {
+    private List<string> messages = new List<string>();
+
+    protected override void OnInitialized()
+    {
+        MessageQueueService.OnMessageReceived += HandleMessageReceived;
+    }
+
+    private void HandleMessageReceived(string message)
+    {
+        InvokeAsync(() =>
+        {
+            messages.Insert(0, message);
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose()
+    {
+        MessageQueueService.OnMessageReceived -= HandleMessageReceived;
+    }
+}
