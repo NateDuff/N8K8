@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job
+spec:
+  template:
+    metadata:
+      name: job
+    spec:
+      containers:
+      - name: job
+        image: n8-job:latest
+        imagePullPolicy: Never
+        command: ["dotnet", "N8.Job.dll"]
+      restartPolicy: Never
