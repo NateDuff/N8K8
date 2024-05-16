@@ -21,6 +21,12 @@ module.exports = {
                 osDarkGray: {
                     400: '#373737'
                 },
+                osLightBlue: {
+                    400: '#B6BDFF'
+                },
+                osBlue: {
+                    400: '#5564FF'
+                },
             }
         }
     },

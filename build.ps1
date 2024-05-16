@@ -1,1 +1,3 @@
-dotnet publish -c Release -p:PublishProfile=DefaultContainer --no-restore
+dotnet publish .\web\N8.Web.csproj -c Release -p:PublishProfile=DefaultContainer --no-restore
+
+dotnet publish .\api\N8.API.csproj -c Release -p:PublishProfile=DefaultContainer -p=PublishAot=false --no-restore

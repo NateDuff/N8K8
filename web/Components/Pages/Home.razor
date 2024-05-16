@@ -1,13 +1,30 @@
 ﻿@page "/"
+@using N8.Shared
+
+@inject IHttpClientFactory HttpClientFactory
+
+@rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
 
 <main class="flex-1 p-4 grid grid-cols-1 md:grid-cols-2 gap-5 pt-24">
     <div class="border-2 border-dashed border-gray-300 rounded-xl dark:border-gray-600 h-96 col-span-2">
         <h2 class="text-4xl font-bold tracking-tight text-center text-osGreen-400 sm:text-6xl">Welcome to Cloud Development Innovation Day</h2>
+        <p>
+            <button @onclick=LoadToDos type="button" class="rounded-md bg-osGreen-400 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-osLightGreen-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Load ToDos from API</button>
+        </p>
     </div>
     <div class="border-2 border-dashed border-gray-300 rounded-xl dark:border-gray-600 h-96">
-
+        <h2 class="text-3xl font-bold tracking-tight text-center text-osBlue-400 sm:text-6xl">ToDo List</h2>
+        @if (todos != null)
+        {
+            <ul class="pl-8 list-disc list-inside">
+                @foreach (var todo in todos)
+                {
+                    <li>@todo.Title</li>
+                }
+            </ul>
+        }
     </div>
     <div class="border-2 border-dashed border-gray-300 rounded-xl dark:border-gray-600 h-96"></div>
     <div class="border-2 border-dashed border-gray-300 rounded-xl dark:border-gray-600 h-96"></div>
@@ -18,3 +35,19 @@
     <div class="border-2 border-dashed border-gray-300 rounded-xl dark:border-gray-600 h-96"></div>
     <div class="border-2 border-dashed border-gray-300 rounded-xl dark:border-gray-600 h-96"></div>
 </main>
+
+@code {
+    private Todo[] todos;
+
+    // Call ToDo API
+    private async Task LoadToDos()
+    {
+        var httpClient = HttpClientFactory.CreateClient("API");
+
+        var response = await httpClient.GetFromJsonAsync<Todo[]>("/todos");
+
+        Console.WriteLine(response);
+
+        todos = response;
+    }
+}
