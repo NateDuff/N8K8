@@ -2,15 +2,29 @@
 
 ## Prerequesits
 
-1. Dotnet 8 SDK & Aspire Workloads
-2. Node v.20 / Latest
+1. Dotnet 8 SDK & Aspire Workloads (minimum: 8.0.0-preview.7.24251.11/8.0.100)
+2. Node v.16 Minimum
 3. Docker Desktop with Kubernetes Enabled
+
+## Setup
+```powershell
+## Install Aspire workload (update if necessary with dotnet workload update)
+dotnet workload install aspire
+
+## Restore packages
+dotnet restore
+
+## Web project NPM installs
+CD .\web
+
+npm install
+
+npm run buildcss ## optional file watcher with npm run buildcss-watch
+```
 
 ## Build
 ```powershell
 ## Builds container images
-dotnet restore
-
 .\build.ps1
 ```
 
