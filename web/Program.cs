@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.ResponseCompression;
 using N8.Shared.Messaging;
-using N8.Web.Components;
 using N8.Web.Hubs.Hubs;
-using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -20,15 +20,7 @@ builder.Services.AddHttpClient("API", client =>
     client.BaseAddress = new Uri(builder.Configuration["ApiEndpoint"]);
 });
 
-builder.Services.AddSingleton<IConnectionFactory>(sp =>
-{
-    return new ConnectionFactory()
-    {
-        HostName = builder.Configuration["RABBITMQ_HOST"],
-        UserName = "guest",
-        Password = "guest"
-    };
-});
+builder.AddRabbitMQClient("messaging");
 
 builder.Services.AddSingleton<MessageQueueService>();
 
@@ -43,7 +35,6 @@ if (!app.Environment.IsDevelopment())
 
     app.UseDeveloperExceptionPage();
 }
-
 
 app.UseResponseCompression();
 app.UseHttpsRedirection();
@@ -62,7 +53,9 @@ app.UseAntiforgery();
 
 app.MapHub<ChatHub>("/chathub");
 
-app.MapRazorComponents<App>()
+app.MapDefaultEndpoints();
+
+app.MapRazorComponents<N8.Web.Components.App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();

@@ -17,15 +17,28 @@ public class Worker : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            var message = $"Worker running at: {DateTimeOffset.Now}";
-            _publisher.PublishMessage(message);
-
-            if (_logger.IsEnabled(LogLevel.Information))
+            try
             {
-                _logger.LogInformation(message);
-            }
+                var message = $"Worker running at: {DateTimeOffset.Now}";
 
-            await Task.Delay(3000, stoppingToken);
+                if (!_publisher.IsConnected)
+                {
+                    _publisher.Initialize();
+                }
+
+                _publisher.PublishMessage(message);
+
+                if (_logger.IsEnabled(LogLevel.Information))
+                {
+                    _logger.LogInformation(message);
+                }
+
+                await Task.Delay(3000, stoppingToken);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "An error occurred while publishing a message.");
+            }
         }
     }
 

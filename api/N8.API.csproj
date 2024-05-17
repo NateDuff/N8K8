@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+	<ProjectReference Include="..\.aspire\N8.Aspire.ServiceDefaults\N8.Aspire.ServiceDefaults.csproj" />
     <ProjectReference Include="..\shared\N8.Shared.csproj" />
   </ItemGroup>
 

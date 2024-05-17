@@ -18,6 +18,7 @@
 
     protected override void OnInitialized()
     {
+        MessageQueueService.Connect();
         MessageQueueService.OnMessageReceived += HandleMessageReceived;
     }
 

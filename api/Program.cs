@@ -3,10 +3,14 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
+builder.AddServiceDefaults();
+
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
 });
+
+var configuration = builder.Configuration;
 
 var app = builder.Build();
 
@@ -24,6 +28,8 @@ todosApi.MapGet("/{id}", (int id) =>
     sampleTodos.FirstOrDefault(a => a.Id == id) is { } todo
         ? Results.Ok(todo)
         : Results.NotFound());
+
+app.MapDefaultEndpoints();
 
 app.Run();
 

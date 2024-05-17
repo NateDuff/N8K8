@@ -5,6 +5,8 @@ namespace N8.Shared.Messaging;
 
 public class RabbitMqPublisher : IDisposable
 {
+    public bool IsConnected => _channel != null && _channel.IsOpen;
+
     private readonly IConnectionFactory _connectionFactory;
     private IConnection _connection;
     private IModel _channel;
@@ -12,10 +14,9 @@ public class RabbitMqPublisher : IDisposable
     public RabbitMqPublisher(IConnectionFactory connectionFactory)
     {
         _connectionFactory = connectionFactory;
-        Initialize();
     }
 
-    private void Initialize()
+    public void Initialize()
     {
         _connection = _connectionFactory.CreateConnection();
         _channel = _connection.CreateModel();
@@ -24,6 +25,11 @@ public class RabbitMqPublisher : IDisposable
 
     public void PublishMessage(string message)
     {
+        if (_channel.IsClosed)
+        {
+            return;
+        }
+
         var body = Encoding.UTF8.GetBytes(message);
         _channel.BasicPublish(exchange: "", routingKey: "myqueue", basicProperties: null, body: body);
     }

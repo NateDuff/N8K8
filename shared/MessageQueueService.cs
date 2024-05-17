@@ -23,6 +23,14 @@ public class MessageQueueService : BackgroundService
         OnMessageReceived?.Invoke(message);
     }
 
+    public void Connect()
+    {
+        if (!_consumer.IsConnected)
+        {
+            _consumer.Initialize();
+        }
+    }
+
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         return Task.CompletedTask;

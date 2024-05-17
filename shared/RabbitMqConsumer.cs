@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using Microsoft.Extensions.Configuration;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 
@@ -6,6 +7,8 @@ namespace N8.Shared.Messaging;
 
 public class RabbitMqConsumer
 {
+    public bool IsConnected => _channel != null && _channel.IsOpen;
+
     private readonly IConnectionFactory _connectionFactory;
     private IConnection _connection;
     private IModel _channel;
@@ -15,10 +18,9 @@ public class RabbitMqConsumer
     public RabbitMqConsumer(IConnectionFactory connectionFactory)
     {
         _connectionFactory = connectionFactory;
-        Initialize();
     }
 
-    private void Initialize()
+    public void Initialize()
     {
         _connection = _connectionFactory.CreateConnection();
         _channel = _connection.CreateModel();

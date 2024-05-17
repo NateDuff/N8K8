@@ -987,6 +987,9 @@ select {
 .h-24 {
   height: 6rem;
 }
+.h-48 {
+  height: 12rem;
+}
 .h-6 {
   height: 1.5rem;
 }
@@ -995,9 +998,6 @@ select {
 }
 .h-96 {
   height: 24rem;
-}
-.h-48 {
-  height: 12rem;
 }
 .max-h-72 {
   max-height: 18rem;
@@ -1336,6 +1336,10 @@ select {
   --tw-text-opacity: 1;
   color: rgb(0 152 91 / var(--tw-text-opacity));
 }
+.text-osOrange-400 {
+  --tw-text-opacity: 1;
+  color: rgb(246 125 2 / var(--tw-text-opacity));
+}
 .text-osPurple-400 {
   --tw-text-opacity: 1;
   color: rgb(110 38 193 / var(--tw-text-opacity));
@@ -1343,10 +1347,6 @@ select {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
-}
-.text-osOrange-400 {
-  --tw-text-opacity: 1;
-  color: rgb(246 125 2 / var(--tw-text-opacity));
 }
 .underline {
   text-decoration-line: underline;
