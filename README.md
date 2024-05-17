@@ -9,6 +9,8 @@
 ## Build
 ```powershell
 ## Builds container images
+dotnet restore
+
 .\build.ps1
 ```
 
