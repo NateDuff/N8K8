@@ -1,0 +1,108 @@
+﻿@using Azure.Core;
+@using Azure.Identity;
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.SignalR.Client
+@using System.Text.Json
+
+@inject NavigationManager Navigation
+@inject IConfiguration configuration
+
+@implements IAsyncDisposable
+
+<h2 class="text-3xl font-bold tracking-tight text-center sm:text-6xl text-osOrange-400">SignalR Websockets</h2>
+
+<div class="py-8 px-8">
+    @if (!ConnectionEstablished)
+    {
+        <div class="relative">
+            <label for="name" class="absolute -top-2 left-2 inline-block bg-osLightGray-400 px-1 text-xs font-medium text-gray-900">Name</label>
+            <input type="text" name="name" id="name" @bind="UserName" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset  bg-osLightGray-400 ring-gray-800 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Jane Smith">
+        </div>
+
+        <button @onclick="Connect" class="text-right rounded-md bg-osGreen-400 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-osLightGreen-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Connect</button>
+    }
+    else
+    {
+        <div class="text-center form-group">
+            <label>
+                Message:
+                <input @bind="messageInput" />
+            </label>
+        </div>
+        <button @onclick="Send" disabled="@(!IsConnected)" type="button" class="text-right rounded-md bg-osGreen-400 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-osLightGreen-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Send</button>
+        <hr>
+
+        <div id="messagesList" class="max-h-72 overflow-auto">
+            @foreach (var message in messages)
+            {
+                <div class="flex items-start gap-2.5 pl-8 pb-4">
+                    <div class="@(message.Item1 == UserName ? "message-current-user" : "message-other-user")">
+                        <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                            <span class="text-sm font-semibold text-white">@message.Item1</span>
+                            <span class="text-sm font-normal text-gray-400">@message.Item3.ToLocalTime().ToString("hh:mm tt")</span>
+                        </div>
+                        <p class="text-sm font-normal py-2.5 text-white">@message.Item2</p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+</div>
+
+@code {
+    private string UserName = string.Empty;
+    private bool ConnectionEstablished = false;
+
+    private HubConnection? hubConnection;
+    private List<(string, string, DateTime)> messages = new();
+    private string? messageInput;
+    private bool IsConnected => hubConnection?.State == HubConnectionState.Connected;
+
+    async Task Connect()
+    {
+        if (string.IsNullOrWhiteSpace(UserName))
+        {
+            return;
+        }
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("http://localhost:8080/chathub"), options =>
+            {
+                options.Headers.Add("user-name", UserName);
+            })
+            .ConfigureLogging(logging =>
+            {
+                 logging.AddConsole();
+            })
+            .Build();
+
+        hubConnection.On<string, string, DateTime>("ReceiveMessage", (user, message, time) =>
+        {
+            messages.Add((user, message, time));
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+
+        ConnectionEstablished = true;
+    }
+
+    private async Task Send()
+    {
+        if (ConnectionEstablished)
+        {
+            await hubConnection.SendAsync("SendMessage", UserName, messageInput);
+
+            messageInput = string.Empty;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+}

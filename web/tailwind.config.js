@@ -30,8 +30,13 @@ module.exports = {
                 osPurple: {
                     400: '#6E26C1'
                 },
+                osOrange: {
+                    400: '#F67D02'
+                },
             }
         }
     },
-  plugins: [],
+    plugins: [
+        require('@tailwindcss/forms'),
+    ],
 }

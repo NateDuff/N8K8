@@ -8,7 +8,7 @@ builder.Services.AddSingleton<IConnectionFactory>(sp =>
 {
     return new ConnectionFactory()
     {
-        HostName = "rabbitmq-service",
+        HostName = builder.Configuration["RABBITMQ_HOST"],
         UserName = "guest",
         Password = "guest"
     };

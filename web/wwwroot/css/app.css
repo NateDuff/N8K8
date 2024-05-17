@@ -45,3 +45,19 @@ h1:focus {
         font-style: normal;
     }
 }
+
+.mobile-menu-open {
+    @apply lg:hidden;
+}
+
+.mobile-menu-closed {
+    @apply hidden;
+}
+
+.message-current-user {
+    @apply flex flex-col w-full max-w-[320px] leading-3 p-4 border-gray-200 rounded-e-xl rounded-es-xl bg-gray-700;
+}
+
+.message-other-user {
+    @apply flex flex-col w-full max-w-[320px] leading-3 p-4 border-gray-200 rounded-e-xl rounded-es-xl bg-gray-200;
+}
