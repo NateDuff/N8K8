@@ -44,4 +44,4 @@ kubectl delete all --all
 - Used for local development of micro-services.
 
 ### K8s
-- Houses all kubernetes deployment & service YAML definitions
+- Houses all kubernetes deployment & service YAML definitions.
