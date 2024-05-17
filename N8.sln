@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34902.65
@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "N8.Shared", "shared\N8.Shar
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "N8.Worker", "worker\N8.Worker.csproj", "{22E775B9-9DE9-46C4-8322-4B26ECDBDFB1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "N8.Job", "job\N8.Job.csproj", "{F779AB85-D7E3-4880-B5EC-1DAA80EE2409}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "N8.Job", "jobs\dotnet-console\N8.Job.csproj", "{F779AB85-D7E3-4880-B5EC-1DAA80EE2409}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

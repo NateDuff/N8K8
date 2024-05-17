@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pwsh-job
+spec:
+  template:
+    metadata:
+      name: pwsh-job
+    spec:
+      containers:
+      - name: pwsh-job
+        image: n8-job-pwsh:latest
+        imagePullPolicy: Never
+      restartPolicy: Never

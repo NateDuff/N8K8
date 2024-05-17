@@ -11,4 +11,5 @@ kubectl apply -f ./.k8s/api-service.yaml
 
 kubectl apply -f ./.k8s/worker-deployment.yaml
 
-#kubectl apply -f ./.k8s/job-deployment.yaml
+#kubectl apply -f ./.k8s/job-dotnet-deployment.yaml
+#kubectl apply -f ./.k8s/job-pwsh-deployment.yaml
