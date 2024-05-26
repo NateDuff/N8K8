@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.ResponseCompression;
-using N8.Shared.Messaging;
 using N8.Web.Hubs.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);

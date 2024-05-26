@@ -1,6 +1,5 @@
 ﻿@using Azure.Messaging.ServiceBus
 @using N8.Shared
-@using N8.Shared.Messaging
 @using System.Text
 @using System.Text.Json
 
@@ -23,7 +22,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _processor = MessagingService.CreateProcessor("ha", new ServiceBusProcessorOptions());
+        _processor = MessagingService.CreateProcessor("newcustomer", new ServiceBusProcessorOptions());
 
         _processor.ProcessMessageAsync += MessageHandler;
         _processor.ProcessErrorAsync += ErrorHandler;

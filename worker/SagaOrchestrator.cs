@@ -25,6 +25,7 @@ public partial class SagaOrchestrator
         _tableServiceClient = tableServiceClient;
 
         _orchestrationClient = _tableServiceClient.GetTableClient("Orchestrations");
+
         _serviceBusSender = _serviceBusClient.CreateSender(provisioningQueue);
 
         _stateMachine = new StateMachine<SagaState, SagaTrigger>(SagaState.Start);

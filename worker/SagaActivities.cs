@@ -10,6 +10,8 @@ public partial class SagaOrchestrator
         // Create customer
         var customerClient = _tableServiceClient.GetTableClient("Customers");
 
+        customerClient.Create();
+
         var customer = new TableEntity("CustomerPartition", orchestration.RowKey)
         {
             { "Name", orchestration["CustomerName"] },

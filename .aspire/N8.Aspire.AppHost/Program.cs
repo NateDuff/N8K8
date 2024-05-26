@@ -3,13 +3,12 @@ var builder = DistributedApplication.CreateBuilder(args);
 //var messaging = builder.AddRabbitMQ("messaging");
 var messaging = builder.AddConnectionString("messaging");
 
-//var storage = builder.AddAzureStorage("storage");
+var tables = builder.AddAzureStorage("storage").RunAsEmulator(container =>
+{
+    container.WithDataBindMount();
+}).AddTables("tables");
 
-//storage.RunAsEmulator();
-
-//var tables = storage.AddTables("tables");
-
-var tables = builder.AddConnectionString("tables");
+//var tables = builder.AddConnectionString("tables");
 
 var api = builder.AddProject<Projects.N8_API>("n8-api")
     .WithReference(tables);

@@ -44,6 +44,8 @@ app.MapPost("/start-provisioning", async (CustomerRequest request, ServiceBusCli
 {
     var tableClient = tableServiceClient.GetTableClient("Orchestrations");
 
+    await tableClient.CreateAsync();
+
     var sagaId = Guid.NewGuid().ToString();
 
     // Create a new orchestration record
