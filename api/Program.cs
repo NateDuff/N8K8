@@ -71,7 +71,7 @@ app.MapPost("/start-provisioning", async (CustomerRequest request, ServiceBusCli
     await using var sender = serviceBusClient.CreateSender("newcustomer");
     await sender.SendMessageAsync(message);
 
-    logger.LogInformation($"Started provisioning saga with ID: {sagaId}");
+    logger.LogInformation("Started provisioning saga with ID: {SagaId}", sagaId);
 
     return Results.Accepted();
 });

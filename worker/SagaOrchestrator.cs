@@ -14,7 +14,7 @@ public partial class SagaOrchestrator
     private readonly TableServiceClient _tableServiceClient;
     private readonly TableClient _orchestrationClient;
     private readonly ServiceBusClient _serviceBusClient;
-    private ServiceBusSender _serviceBusSender;
+    private readonly ServiceBusSender _serviceBusSender;
     private readonly ILogger<SagaOrchestrator> _logger;
     private const string provisioningQueue = "newcustomer";
 
@@ -32,6 +32,9 @@ public partial class SagaOrchestrator
         ConfigureStateMachine();
     }
 
+    /// <summary>
+    /// Configures the state machine transitions.
+    /// </summary>
     private void ConfigureStateMachine()
     {
         _stateMachine.OnTransitioned(transition =>
@@ -66,37 +69,55 @@ public partial class SagaOrchestrator
             .Permit(SagaTrigger.Error, SagaState.Failed);
     }
 
-    public async Task ProcessAsync(SagaMessage sagaMessage)
+    /// <summary>
+    /// Processes the saga message from the queue & starts orchestration activties based on the current state.
+    /// </summary>
+    /// <param name="sagaMessage"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public async Task ProcessAsync(SagaMessage sagaMessage, CancellationToken cancellationToken = default)
     {
-        var orchestration = await _orchestrationClient.GetEntityAsync<TableEntity>("Orchestration", sagaMessage.SagaId);
+        var orchestration = await _orchestrationClient.GetEntityAsync<TableEntity>("Orchestration", sagaMessage.SagaId, cancellationToken: cancellationToken);
 
-        switch (_stateMachine.State)
+        try
         {
-            case SagaState.Start:
-                await ProcessCreateCustomerAsync(orchestration);
-                break;
+            switch (_stateMachine.State)
+            {
+                case SagaState.Start:
+                    await ProcessCreateCustomerAsync(orchestration, cancellationToken: cancellationToken);
+                    break;
 
-            case SagaState.CustomerCreated:
-                await ProcessCreateSubscriptionAsync(orchestration);
-                break;
+                case SagaState.CustomerCreated:
+                    await ProcessCreateSubscriptionAsync(orchestration, cancellationToken: cancellationToken);
+                    break;
 
-            case SagaState.SubscriptionCreated:
-                await ProcessStartPipelineAndSendEmailAsync(orchestration);
-                break;
+                case SagaState.SubscriptionCreated:
+                    await ProcessStartPipelineAndSendEmailAsync(orchestration, cancellationToken: cancellationToken);
+                    break;
 
-            case SagaState.PipelineStartedAndEmailSent:
-                await ProcessCloseRequestAsync(orchestration);
-                break;
+                case SagaState.PipelineStartedAndEmailSent:
+                    await ProcessCloseRequestAsync(orchestration, cancellationToken: cancellationToken);
+                    break;
 
-            default:
-                _logger.LogError("Invalid saga state {State}.", nameof(_stateMachine.State));
-                throw new InvalidOperationException("Invalid saga state.");
+                default:
+                    _logger.LogError("Invalid saga state {State}.", nameof(_stateMachine.State));
+                    throw new InvalidOperationException("Invalid saga state.");
+            }
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(orchestration, ex, cancellationToken: cancellationToken);
         }
     }
 
-    private async Task UpdateOrchestrationAsync(TableEntity orchestration)
+    /// <summary>
+    /// Updates the orchestration entity in the table storage and sends the next message to the queue.
+    /// </summary>
+    /// <param name="orchestration"></param>
+    /// <returns></returns>
+    private async Task UpdateOrchestrationAsync(TableEntity orchestration, CancellationToken cancellationToken = default)
     {
-        await _orchestrationClient.UpdateEntityAsync(orchestration, ETag.All, TableUpdateMode.Replace);
+        await _orchestrationClient.UpdateEntityAsync(orchestration, ETag.All, TableUpdateMode.Replace, cancellationToken: cancellationToken);
 
         if (_stateMachine.State == SagaState.Closed)
         {
@@ -107,7 +128,7 @@ public partial class SagaOrchestrator
         var sagaMessage = new SagaMessage
         {
             SagaId = orchestration.RowKey,
-            Status = orchestration["Status"].ToString()
+            Status = orchestration["Status"].ToString() ?? throw new InvalidOperationException("Status is not set.")
         };
 
         var sagaMessageJson = JsonSerializer.Serialize(sagaMessage, SagaMessageSerializerContext.Default.SagaMessage);
@@ -116,10 +137,16 @@ public partial class SagaOrchestrator
             MessageId = Guid.NewGuid().ToString()
         };
 
-        await _serviceBusSender.SendMessageAsync(message);
+        await _serviceBusSender.SendMessageAsync(message, cancellationToken: cancellationToken);
     }
 
-    private async Task HandleErrorAsync(TableEntity orchestration, Exception ex)
+    /// <summary>
+    /// Handles an error that occurred while processing the orchestration.
+    /// </summary>
+    /// <param name="orchestration"></param>
+    /// <param name="ex"></param>
+    /// <returns></returns>
+    private async Task HandleErrorAsync(TableEntity orchestration, Exception ex, CancellationToken cancellationToken = default)
     {
         _logger.LogError(ex, "An error occurred while processing the orchestration.");
 
@@ -128,6 +155,6 @@ public partial class SagaOrchestrator
         orchestration["Status"] = _stateMachine.State.ToString();
         orchestration["Errors"] = JsonSerializer.Serialize(new { ex.Message, ex.StackTrace }, SagaMessageSerializerContext.Default.SagaMessage);
 
-        await UpdateOrchestrationAsync(orchestration);
+        await UpdateOrchestrationAsync(orchestration, cancellationToken);
     }
 }

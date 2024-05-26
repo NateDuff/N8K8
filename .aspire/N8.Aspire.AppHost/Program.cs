@@ -23,6 +23,6 @@ builder.AddProject<Projects.N8_Web>("n8-web")
 builder.AddProject<Projects.N8_Worker>("n8-worker")
     .WithReference(messaging)
     .WithReference(tables);
-    //.WaitFor(messaging);
+//.WaitFor(messaging);
 
 builder.Build().Run();

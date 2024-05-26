@@ -1,4 +1,3 @@
-using N8.Shared.Messaging;
 using N8.Shared.Serializers;
 using N8.Worker;
 using N8.Worker.Saga;
@@ -7,14 +6,9 @@ var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults();
 
-//builder.AddRabbitMQClient("messaging");
 builder.AddAzureServiceBusClient("messaging");
 builder.AddAzureTableClient("tables");
 
-//builder.Services.AddSingleton<RabbitMqPublisher>();
-//builder.Services.AddSingleton<ServiceBusPublisher>();
-
-//builder.Services.AddHostedService<Worker>();
 builder.Services.AddSingleton<SagaOrchestrator>();
 builder.Services.AddHostedService<CustomerProvisioningWorker>();
 

@@ -6,8 +6,8 @@ public record CustomerRequest(string CustomerName, string CustomerEmail, string 
 
 public record SagaMessage
 {
-    public string SagaId { get; set; }
-    public string Status { get; set; }
+    public required string SagaId { get; set; }
+    public required string Status { get; set; }
 }
 
 public enum SagaState
