@@ -1,10 +1,14 @@
-﻿@using N8.Shared.Messaging
+﻿@using Azure.Messaging.ServiceBus
+@using N8.Shared
+@using N8.Shared.Messaging
+@using System.Text
+@using System.Text.Json
 
 @rendermode InteractiveServer
 
-@inject MessageQueueService MessageQueueService
+@inject ServiceBusClient MessagingService
 
-<h2 class="text-3xl font-bold tracking-tight text-center sm:text-6xl text-osPurple-400">Messages from RabbitMQ Queue</h2>
+<h2 class="text-3xl font-bold tracking-tight text-center sm:text-6xl text-osPurple-400">Queue Messages</h2>
 
 <ul class="pl-8 max-h-72 overflow-auto">
     @foreach (var message in messages)
@@ -14,12 +18,43 @@
 </ul>
 
 @code {
+    private ServiceBusProcessor _processor;
     private List<string> messages = new List<string>();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        MessageQueueService.Connect();
-        MessageQueueService.OnMessageReceived += HandleMessageReceived;
+        _processor = MessagingService.CreateProcessor("ha", new ServiceBusProcessorOptions());
+
+        _processor.ProcessMessageAsync += MessageHandler;
+        _processor.ProcessErrorAsync += ErrorHandler;
+
+        await _processor.StartProcessingAsync();
+    }
+
+    private async Task MessageHandler(ProcessMessageEventArgs args)
+    {
+        var body = args.Message.Body.ToArray();
+        var message = Encoding.UTF8.GetString(body);
+
+        var mess = JsonSerializer.Deserialize<MessageBody>(message);
+
+        var status = mess.message;
+
+        if (!string.IsNullOrEmpty(status))
+        {
+            message = status;
+        }
+
+        HandleMessageReceived(message);
+
+        await args.CompleteMessageAsync(args.Message);
+    }
+
+    private Task ErrorHandler(ProcessErrorEventArgs args)
+    {
+        // Handle error here, e.g., log it
+        Console.WriteLine(args.Exception.ToString());
+        return Task.CompletedTask;
     }
 
     private void HandleMessageReceived(string message)
@@ -31,8 +66,14 @@
         });
     }
 
-    public void Dispose()
+    public async Task DisposeAsync()
     {
-        MessageQueueService.OnMessageReceived -= HandleMessageReceived;
+        if (_processor != null)
+        {
+            await _processor.StopProcessingAsync();
+            await _processor.DisposeAsync();
+        }
     }
+
+    public record MessageBody(string message);
 }

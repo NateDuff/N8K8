@@ -1,45 +1,56 @@
-﻿using Microsoft.Extensions.Configuration;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
+﻿using Azure.Messaging.ServiceBus;
+using Microsoft.Extensions.Configuration;
 using System.Text;
 
 namespace N8.Shared.Messaging;
 
-public class RabbitMqConsumer
+public class ServiceBusConsumer : IAsyncDisposable
 {
-    public bool IsConnected => _channel != null && _channel.IsOpen;
-
-    private readonly IConnectionFactory _connectionFactory;
-    private IConnection _connection;
-    private IModel _channel;
+    private readonly string _queueName;
+    private ServiceBusClient _client;
+    private ServiceBusProcessor _processor;
 
     public event Action<string> OnMessageReceived;
 
-    public RabbitMqConsumer(IConnectionFactory connectionFactory)
+    public async Task InitializeAsync(ServiceBusClient client)
     {
-        _connectionFactory = connectionFactory;
+        _client = client;
+
+        _processor = _client.CreateProcessor("ha", new ServiceBusProcessorOptions());
+
+        _processor.ProcessMessageAsync += MessageHandler;
+        _processor.ProcessErrorAsync += ErrorHandler;
+
+        await _processor.StartProcessingAsync();
     }
 
-    public void Initialize()
+    private async Task MessageHandler(ProcessMessageEventArgs args)
     {
-        _connection = _connectionFactory.CreateConnection();
-        _channel = _connection.CreateModel();
-        _channel.QueueDeclare(queue: "myqueue", durable: false, exclusive: false, autoDelete: false, arguments: null);
+        var body = args.Message.Body.ToArray();
+        var message = Encoding.UTF8.GetString(body);
+        OnMessageReceived?.Invoke(message);
 
-        var consumer = new EventingBasicConsumer(_channel);
-        consumer.Received += (model, ea) =>
+        await args.CompleteMessageAsync(args.Message);
+    }
+
+    private Task ErrorHandler(ProcessErrorEventArgs args)
+    {
+        // Handle error here, e.g., log it
+        Console.WriteLine(args.Exception.ToString());
+        return Task.CompletedTask;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_processor != null)
         {
-            var body = ea.Body.ToArray();
-            var message = Encoding.UTF8.GetString(body);
-            OnMessageReceived?.Invoke(message);
-        };
+            await _processor.StopProcessingAsync();
+            await _processor.DisposeAsync();
+        }
 
-        _channel.BasicConsume(queue: "myqueue", autoAck: true, consumer: consumer);
-    }
-
-    public void Dispose()
-    {
-        _channel?.Close();
-        _connection?.Close();
+        if (_client != null)
+        {
+            await _client.DisposeAsync();
+        }
     }
 }

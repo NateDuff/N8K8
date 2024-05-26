@@ -1,42 +1,42 @@
-﻿using RabbitMQ.Client;
+﻿using Azure.Messaging.ServiceBus;
 using System.Text;
 
 namespace N8.Shared.Messaging;
 
-public class RabbitMqPublisher : IDisposable
+public class ServiceBusPublisher : IAsyncDisposable
 {
-    public bool IsConnected => _channel != null && _channel.IsOpen;
+    private readonly string _queueName = "ha";
+    private ServiceBusClient _client;
+    private ServiceBusSender _sender;
 
-    private readonly IConnectionFactory _connectionFactory;
-    private IConnection _connection;
-    private IModel _channel;
-
-    public RabbitMqPublisher(IConnectionFactory connectionFactory)
+    public ServiceBusPublisher(ServiceBusClient client)
     {
-        _connectionFactory = connectionFactory;
+        _client = client;
+        _sender = _client.CreateSender(_queueName);
     }
 
-    public void Initialize()
+    public async Task PublishMessageAsync(string message)
     {
-        _connection = _connectionFactory.CreateConnection();
-        _channel = _connection.CreateModel();
-        _channel.QueueDeclare(queue: "myqueue", durable: false, exclusive: false, autoDelete: false, arguments: null);
-    }
-
-    public void PublishMessage(string message)
-    {
-        if (_channel.IsClosed)
+        if (_sender == null)
         {
-            return;
+            throw new InvalidOperationException("ServiceBusSender is not initialized.");
         }
 
         var body = Encoding.UTF8.GetBytes(message);
-        _channel.BasicPublish(exchange: "", routingKey: "myqueue", basicProperties: null, body: body);
+        var serviceBusMessage = new ServiceBusMessage(body);
+        await _sender.SendMessageAsync(serviceBusMessage);
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        _channel?.Close();
-        _connection?.Close();
+        if (_sender != null)
+        {
+            await _sender.DisposeAsync();
+        }
+
+        if (_client != null)
+        {
+            await _client.DisposeAsync();
+        }
     }
 }

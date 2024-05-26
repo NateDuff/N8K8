@@ -20,9 +20,11 @@ builder.Services.AddHttpClient("API", client =>
     client.BaseAddress = new Uri(builder.Configuration["ApiEndpoint"]);
 });
 
-builder.AddRabbitMQClient("messaging");
+//builder.AddRabbitMQClient("messaging");
+builder.AddAzureServiceBusClient("messaging");
+builder.AddAzureTableClient("tables");
 
-builder.Services.AddSingleton<MessageQueueService>();
+//builder.Services.AddSingleton<MessageQueueService>();
 
 var app = builder.Build();
 
