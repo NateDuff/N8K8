@@ -9,3 +9,22 @@ public record SagaMessage
     public string SagaId { get; set; }
     public string Status { get; set; }
 }
+
+public enum SagaState
+{
+    Start,
+    CustomerCreated,
+    SubscriptionCreated,
+    PipelineStartedAndEmailSent,
+    Closed,
+    Failed
+}
+
+public enum SagaTrigger
+{
+    CreateCustomer,
+    CreateSubscription,
+    StartPipelineAndSendEmail,
+    Close,
+    Error
+}

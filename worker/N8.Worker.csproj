@@ -16,6 +16,7 @@
 	<!--<PackageReference Include="Aspire.RabbitMQ.Client" Version="8.0.1" />-->
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.6" />
+    <PackageReference Include="Stateless" Version="5.16.0" />
   </ItemGroup>
 
   <ItemGroup>

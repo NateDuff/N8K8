@@ -1,6 +1,7 @@
 using N8.Shared.Messaging;
 using N8.Shared.Serializers;
 using N8.Worker;
+using N8.Worker.Saga;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -14,6 +15,7 @@ builder.AddAzureTableClient("tables");
 //builder.Services.AddSingleton<ServiceBusPublisher>();
 
 //builder.Services.AddHostedService<Worker>();
+builder.Services.AddSingleton<SagaOrchestrator>();
 builder.Services.AddHostedService<CustomerProvisioningWorker>();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
