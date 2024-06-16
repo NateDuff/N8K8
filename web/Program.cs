@@ -51,6 +51,7 @@ app.UseStaticFiles(new StaticFileOptions
     }
 });
 app.UseAntiforgery();
+app.UseForwardedHeaders();
 
 app.MapHub<ChatHub>("/chathub");
 

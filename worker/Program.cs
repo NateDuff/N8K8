@@ -9,6 +9,8 @@ builder.AddServiceDefaults();
 builder.AddAzureServiceBusClient("messaging");
 builder.AddAzureTableClient("tables");
 
+//builder.Services.AddHostedService<SampleTimerTriggeredJob>();
+
 builder.Services.AddSingleton<SagaOrchestrator>();
 builder.Services.AddHostedService<CustomerProvisioningWorker>();
 

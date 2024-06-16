@@ -1,4 +1,5 @@
 using Azure.Messaging.ServiceBus;
+using N8.Shared.Saga;
 using N8.Shared.Serializers;
 using N8.Worker.Saga;
 using System.Text.Json;
@@ -22,12 +23,12 @@ public class CustomerProvisioningWorker(ServiceBusClient serviceBusClient, SagaO
         {
             try
             {
-                var message = await _receiver.ReceiveMessageAsync(cancellationToken: stoppingToken);
+                ServiceBusReceivedMessage message = await _receiver.ReceiveMessageAsync(cancellationToken: stoppingToken);
 
                 if (message != null)
                 {
-                    var sagaMessageJson = message.Body.ToString();
-                    var sagaMessage = JsonSerializer.Deserialize(sagaMessageJson, SagaMessageSerializerContext.Default.SagaMessage);
+                    string sagaMessageJson = message.Body.ToString();
+                    SagaMessage? sagaMessage = JsonSerializer.Deserialize(sagaMessageJson, SagaMessageSerializerContext.Default.SagaMessage);
 
                     if (sagaMessage == null)
                     {
