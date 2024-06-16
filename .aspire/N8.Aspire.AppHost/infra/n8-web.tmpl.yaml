@@ -54,6 +54,7 @@ properties:
             value: http://n8-api.{{ .Env.AZURE_CONTAINER_APPS_ENVIRONMENT_DEFAULT_DOMAIN }}
     scale:
       minReplicas: 0
+      maxReplicas: 2
 tags:
   azd-service-name: n8-web
   aspire-resource-name: n8-web

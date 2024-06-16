@@ -41,6 +41,7 @@ properties:
             secretRef: connectionstrings--tables
     scale:
       minReplicas: 0
+      maxReplicas: 2
 tags:
   azd-service-name: n8-worker
   aspire-resource-name: n8-worker
