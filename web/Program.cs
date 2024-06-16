@@ -1,3 +1,4 @@
+using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Microsoft.AspNetCore.ResponseCompression;
 using N8.Web.Hubs.Hubs;
 
@@ -19,10 +20,16 @@ builder.Services.AddHttpClient("API", client =>
     client.BaseAddress = new Uri(builder.Configuration["ApiEndpoint"]);
 });
 
+builder.Configuration.AddAzureKeyVaultSecrets("secrets");
+
 //builder.AddRabbitMQClient("messaging");
 builder.AddAzureServiceBusClient("messaging");
 builder.AddAzureTableClient("tables");
 
+if (!string.IsNullOrEmpty(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
+{
+    builder.Services.AddOpenTelemetry().UseAzureMonitor();
+}
 //builder.Services.AddSingleton<MessageQueueService>();
 
 var app = builder.Build();
@@ -33,11 +40,14 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
-
+    
+    app.UseResponseCompression();
+}
+else
+{
     app.UseDeveloperExceptionPage();
 }
 
-app.UseResponseCompression();
 app.UseHttpsRedirection();
 
 var cacheMaxAgeOneWeek = (60 * 60 * 24 * 7).ToString();

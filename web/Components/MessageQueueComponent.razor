@@ -3,18 +3,11 @@
 @using System.Text
 @using System.Text.Json
 
-@rendermode InteractiveServer
-
 @inject ServiceBusClient MessagingService
 
 <h2 class="text-3xl font-bold tracking-tight text-center sm:text-6xl text-osPurple-400">Queue Messages</h2>
 
-<ul class="pl-8 max-h-72 overflow-auto">
-    @foreach (var message in messages)
-    {
-        <li class="odd:text-osBlue-400">@message</li>
-    }
-</ul>
+<MessageQueueList Messages="messages" />
 
 @code {
     private ServiceBusProcessor _processor;
@@ -22,7 +15,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _processor = MessagingService.CreateProcessor("newcustomer", new ServiceBusProcessorOptions());
+        _processor = MessagingService.CreateProcessor("ha", new ServiceBusProcessorOptions());
 
         _processor.ProcessMessageAsync += MessageHandler;
         _processor.ProcessErrorAsync += ErrorHandler;
@@ -44,6 +37,8 @@
             message = status;
         }
 
+        Console.WriteLine($"~~~~~~~~~~~~~~~ Received: {message}");
+
         HandleMessageReceived(message);
 
         await args.CompleteMessageAsync(args.Message);
@@ -60,7 +55,8 @@
     {
         InvokeAsync(() =>
         {
-            messages.Insert(0, message);
+            messages.Add(message);
+            //messages.Insert(0, message);
             StateHasChanged();
         });
     }

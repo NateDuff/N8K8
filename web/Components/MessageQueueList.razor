@@ -1,0 +1,11 @@
+﻿<ul class="pl-8 max-h-72 overflow-auto">
+    @foreach (var message in Messages)
+    {
+        <li class="odd:text-osBlue-400">@message</li>
+    }
+</ul>
+
+@code {
+    [Parameter]
+    public List<string> Messages { get; set; }
+}

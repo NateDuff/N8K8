@@ -1,5 +1,6 @@
 using Azure.Data.Tables;
 using Azure.Messaging.ServiceBus;
+using Azure.Monitor.OpenTelemetry.AspNetCore;
 using N8.Shared;
 using N8.Shared.Saga;
 using N8.Shared.Serializers;
@@ -20,6 +21,11 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.TypeInfoResolverChain.Insert(2, SagaMessageSerializerContext.Default);
     options.SerializerOptions.TypeInfoResolverChain.Insert(3, ServiceBusMessageSerializerContext.Default);
 });
+
+if (!string.IsNullOrEmpty(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
+{
+    builder.Services.AddOpenTelemetry().UseAzureMonitor();
+}
 
 var configuration = builder.Configuration;
 
@@ -78,6 +84,7 @@ app.MapPost("/start-provisioning", async (CustomerRequest request, ServiceBusCli
     return Results.Accepted();
 });
 
+app.MapGet("/config", (IConfiguration configuration) => configuration.AsEnumerable());
 
 app.MapDefaultEndpoints();
 

@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: n8-k8
+services:  
+  app:
+    language: dotnet
+    project: .\.aspire\N8.Aspire.AppHost\N8.Aspire.AppHost.csproj
+    host: containerapp
+infra:
+  path: .infrastructure

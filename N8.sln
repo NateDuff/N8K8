@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "N8.Worker", "worker\N8.Work
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "N8.Job", "jobs\dotnet-console\N8.Job.csproj", "{F779AB85-D7E3-4880-B5EC-1DAA80EE2409}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "N8.Aspire.AppHost", ".aspire\N8.Aspire.AppHost\N8.Aspire.AppHost.csproj", "{BE0FC404-32B4-4FE8-9DBB-C2A8A94DB868}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "N8.Aspire.AppHost", ".aspire\N8.Aspire.AppHost\N8.Aspire.AppHost.csproj", "{BE0FC404-32B4-4FE8-9DBB-C2A8A94DB868}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "N8.Aspire.ServiceDefaults", ".aspire\N8.Aspire.ServiceDefaults\N8.Aspire.ServiceDefaults.csproj", "{507206CB-AE03-4AF6-BA3B-DD728876ED07}"
 EndProject

@@ -20,6 +20,12 @@ CD .\web
 npm install
 
 npm run buildcss ## optional file watcher with npm run buildcss-watch
+
+## User secret setup
+CD ..\.aspire\N8.Aspire.AppHost\
+
+dotnet user-secrets set MESSAGING "{{REDACTED}}"
+
 ```
 
 ## Build

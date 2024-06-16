@@ -14,11 +14,10 @@
 </head>
 
 <body>
-    <Routes />
+    <Routes @rendermode=@InteractiveServer />
     <script src="_framework/blazor.web.js?version=@version" autostart="false"></script>
     <script lang="javascript">
         Blazor.start({
-            ssr: { disableDomPreservation: true },
             circuit: {
                 reconnectionOptions: {
                     maxRetries: 100, retryIntervalMilliseconds: 500
