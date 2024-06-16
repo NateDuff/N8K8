@@ -21,10 +21,18 @@ npm install
 
 npm run buildcss ## optional file watcher with npm run buildcss-watch
 
-## User secret setup
+## Local user secret setup
 CD ..\.aspire\N8.Aspire.AppHost\
 
-dotnet user-secrets set MESSAGING "{{REDACTED}}"
+dotnet user-secrets set Parameters:messaging "{{REDACTED}}"
+
+## Azure development environment setup
+CD ..\..\
+
+azd env new "{{ENVNAME}}"
+#azd env select "{{ENVNAME}}" ## only needed after first env
+azd env set AZURE_MESSAGING "{{REDACTED}}"
+azd up
 
 ```
 
