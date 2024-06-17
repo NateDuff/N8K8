@@ -25,7 +25,6 @@
 	<PackageReference Include="Aspire.Azure.Messaging.ServiceBus" Version="8.0.1" />
 	<PackageReference Include="Aspire.Azure.Security.KeyVault" Version="8.0.1" />
 	<!--<PackageReference Include="Aspire.RabbitMQ.Client" Version="8.0.1" />-->
-    <PackageReference Include="Azure.Identity" Version="1.11.3" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.5" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.6" />
   </ItemGroup>

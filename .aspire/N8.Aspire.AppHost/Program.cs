@@ -1,30 +1,13 @@
-using Aspire.Hosting.Azure;
+using N8.Aspire.AppHost.Extensions;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
+//Parameters
 var messaging = builder.AddParameter("messaging", true);
-
 var envName = builder.AddParameter("environmentName");
 
-BicepOutputReference appInsightsConnection;
-
-if (builder.ExecutionContext.IsPublishMode)
-{
-    var law = builder.AddBicepTemplate("law", "../../.infrastructure/law/law.bicep")
-        .WithParameter("environmentName", envName);
-
-    appInsightsConnection = builder.AddBicepTemplate("ai", "../../.infrastructure/ai/app-insights.bicep")
-        .WithParameter(AzureBicepResource.KnownParameters.LogAnalyticsWorkspaceId)
-        .WithParameter("environmentName", envName)
-        .GetOutput("appInsightsConnectionString");
-}
-else
-{
-    appInsightsConnection = builder.AddBicepTemplate("ai", "../../.infrastructure/ai/app-insights.bicep")
-        .WithParameter("logAnalyticsWorkspaceId", builder.AddParameter("laWorkspaceId"))
-        .WithParameter("environmentName", envName)
-        .GetOutput("appInsightsConnectionString");
-}
+// Services
+var appInsightsConnection = builder.AddBicepAppInsightsTemplate(envName);
 
 var secrets = builder.ExecutionContext.IsPublishMode
     ? builder.AddAzureKeyVault("secrets")
@@ -36,22 +19,22 @@ var tables = builder.AddAzureStorage("storage").RunAsEmulator(container =>
     container.WithDataBindMount();
 }).AddTables("tables");
 
+// Projects
 var api = builder.AddProject<Projects.N8_API>("n8-api")
-    .WithEnvironment("APPLICATIONINSIGHTS_CONNECTION_STRING", appInsightsConnection)
+    .WithAppInsights(appInsightsConnection)
     .WithReference(tables)
     .WithExternalHttpEndpoints();
 
 builder.AddProject<Projects.N8_Web>("n8-web")
-    .WithEnvironment("APPLICATIONINSIGHTS_CONNECTION_STRING", appInsightsConnection)
+    .WithAppInsights(appInsightsConnection)
     .WithReference(secrets)
     .WithReference(api)
     .WithReference(tables)
     .WithExternalHttpEndpoints();
 
 builder.AddProject<Projects.N8_Worker>("n8-worker")
-    .WithEnvironment("APPLICATIONINSIGHTS_CONNECTION_STRING", appInsightsConnection)
+    .WithAppInsights(appInsightsConnection)
     .WithReference(secrets)
-    .WithReference(tables)
-    .WithExternalHttpEndpoints();
+    .WithReference(tables);
 
 builder.Build().Run();
