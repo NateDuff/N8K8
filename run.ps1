@@ -13,3 +13,14 @@ kubectl apply -f ./.k8s/worker-deployment.yaml
 
 #kubectl apply -f ./.k8s/job-dotnet-deployment.yaml
 #kubectl apply -f ./.k8s/job-pwsh-deployment.yaml
+
+# azd up
+
+# aspirate generate --output-format helm
+# aspirate build
+
+# aspirate start
+# aspirate stop
+
+# helm upgrade demo .\aspirate-output\Chart\ --install --namespace aspire-demo --create-namespace --wait
+# helm uninstall demo --namespace aspire-demo

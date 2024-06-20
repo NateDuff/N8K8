@@ -1,0 +1,90 @@
+﻿@using Azure.Messaging.ServiceBus
+@using N8.Shared
+@using System.Text
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@using N8.Shared.Saga
+@using N8.Shared.Serializers
+
+@rendermode InteractiveServer
+
+@inject ServiceBusClient MessagingService
+@inject IHttpClientFactory HttpClientFactory
+
+<h2 class="text-3xl font-bold tracking-tight text-center text-osDarkGray-400 sm:text-6xl">Saga</h2>
+
+<EditForm Model="customerModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="max-w-lg ml-8">
+        <label for="customerNameField" class="block text-sm font-medium leading-6 text-gray-900">Name</label>
+        <div class="relative mt-2 rounded-md shadow-sm">
+            <InputText type="text" name="customerNameField" id="customerNameField" class="formInput peer" placeholder="Example customer name" aria-invalid="true" aria-describedby="email-error" @bind-Value="@customerModel.CustomerName" />
+
+            <div class="invisible peer-[.invalid]:visible pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                </svg>
+            </div>
+        </div>
+
+        <p class="mt-2 text-sm text-red-600" id="email-error">
+            <ValidationMessage For="@(() => customerModel.CustomerName)" />
+        </p>
+    </div>
+
+    <div class="max-w-lg ml-8">
+        <label for="customerEmailField" class="block text-sm font-medium leading-6 text-gray-900">Email</label>
+        <div class="relative mt-2 rounded-md shadow-sm">
+            <InputText type="email" name="customerEmailField" id="customerEmailField" class="formInput peer" placeholder="Example customer email" aria-invalid="true" aria-describedby="email-error" @bind-Value="@customerModel.CustomerEmail" />
+
+            <div class="invisible peer-[.invalid]:visible pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                </svg>
+            </div>
+        </div>
+
+        <p class="mt-2 text-sm text-red-600" id="email-error">
+            <ValidationMessage For="@(() => customerModel.CustomerEmail)" />
+        </p>
+    </div>
+
+    <div class="max-w-lg ml-8">
+        <label for="customerSubNameField" class="block text-sm font-medium leading-6 text-gray-900">Subscription Name</label>
+        <div class="relative mt-2 rounded-md shadow-sm">
+            <InputText type="text" name="customerSubNameField" id="customerSubNameField" class="formInput peer" placeholder="Example subscription name" aria-invalid="true" aria-describedby="email-error" @bind-Value="@customerModel.SubscriptionName" />
+
+            <div class="invisible peer-[.invalid]:visible pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                </svg>
+            </div>
+        </div>
+
+        <p class="mt-2 text-sm text-red-600" id="email-error">
+            <ValidationMessage For="@(() => customerModel.SubscriptionName)" />
+        </p>
+    </div>
+
+    <button type="submit" class="rounded-md bg-osGreen-400 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-osLightGreen-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Send</button>
+</EditForm>
+
+@code {
+    private CustomerRequest customerModel = new CustomerRequest();
+
+    private async Task HandleValidSubmit()
+    {
+        var httpClient = HttpClientFactory.CreateClient("API");
+
+        // Send the customer request to the API 
+        var response = await httpClient.PutAsJsonAsync<CustomerRequest>("/start-provisioning", customerModel, new JsonSerializerOptions
+        {
+            TypeInfoResolver = CustomerRequestSerializerContext.Default
+        });
+
+        Console.WriteLine(response);
+
+        customerModel = new CustomerRequest();
+    }
+}

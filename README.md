@@ -32,7 +32,6 @@ CD ..\..\
 azd env new "{{ENVNAME}}"
 #azd env select "{{ENVNAME}}" ## only needed after first env
 azd env set AZURE_MESSAGING "{{REDACTED}}"
-azd up
 
 ```
 
@@ -52,6 +51,11 @@ azd up
 ```powershell
 ## Deletes everything in K8s
 kubectl delete all --all
+```
+
+## Release via AZD CLI
+```powershell
+azd up
 ```
 
 # Architecture

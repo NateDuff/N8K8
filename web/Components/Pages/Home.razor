@@ -8,45 +8,30 @@
 <PageTitle>Home</PageTitle>
 
 <main class="flex-1 p-4 grid grid-cols-1 md:grid-cols-2 gap-5 pt-24">
-    <div class="border-2 border-dashed border-gray-300 rounded-xl dark:border-gray-600 h-48 col-span-1 md:col-span-2">
-        <h2 class="text-4xl font-bold tracking-tight text-center text-osGreen-400 sm:text-6xl">Welcome to Cloud Development Innovation Day</h2>
+    <div class="border-2 border-dashed border-gray-300 rounded-xl dark:border-gray-600 h-64 col-span-1 md:col-span-2">
+        <h2 class="text-4xl font-bold tracking-tight text-center text-osGreen-400 sm:text-6xl">Welcome to Cloud Development Innovation Day II</h2>
         <p>
-            <button @onclick=LoadToDos type="button" class="rounded-md bg-osGreen-400 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-osLightGreen-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Load ToDos from API</button>
+            <MessageSender />
         </p>
     </div>
     <div class="border-2 border-dashed border-gray-300 rounded-xl dark:border-gray-600 h-96">
-        <h2 class="text-3xl font-bold tracking-tight text-center text-osBlue-400 sm:text-6xl">ToDo List</h2>
-        @if (todos != null)
-        {
-            <ul class="pl-8 list-disc list-inside">
-                @foreach (var todo in todos)
-                {
-                    <li class="even:text-osPurple-400">@todo.Title</li>
-                }
-            </ul>
-        }
+        <ApiComponent />
     </div>
     <div class="border-2 border-dashed border-gray-300 rounded-xl dark:border-gray-600 h-96">
-        <MessageQueueComponent />
+        <h2 class="text-3xl font-bold tracking-tight text-center sm:text-6xl text-osPurple-400">Day 2 ToDo List</h2>
+        <ul class="list-inside list-decimal p-8">
+            <li class="line-through">Simple Saga Implementation with the 'Stateless' library over Azure Service Bus</li>
+            <li class="line-through">Azure Developer CLI Implementation</li>
+            <li class="line-through">Azure Container Apps Infrastructure Adoption</li>
+            <li>Aspire Custom Infrastructure Steps</li>
+            <li>Aspirify for Azure Kubernetes Adoption</li>
+            <li>BONUS: Orleans Adoption</li>
+        </ul>
+    </div>
+    <div class="border-2 border-dashed border-gray-300 rounded-xl dark:border-gray-600 h-96">
+        <CustomerCreator />
     </div>
     <div class="border-2 border-dashed border-gray-300 rounded-xl dark:border-gray-600 h-96">
         <Messaging />
     </div>
-    <div class="border-2 border-dashed border-gray-300 rounded-xl dark:border-gray-600 h-96"></div>
 </main>
-
-@code {
-    private Todo[]? todos;
-
-    // Call ToDo API
-    private async Task LoadToDos()
-    {
-        var httpClient = HttpClientFactory.CreateClient("API");
-
-        var response = await httpClient.GetFromJsonAsync<Todo[]>("/todos");
-
-        Console.WriteLine(response);
-
-        todos = response;
-    }
-}

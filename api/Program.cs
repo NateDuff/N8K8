@@ -1,16 +1,17 @@
 using Azure.Data.Tables;
 using Azure.Messaging.ServiceBus;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
+using Microsoft.AspNetCore.Mvc;
 using N8.Shared;
 using N8.Shared.Saga;
 using N8.Shared.Serializers;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.AddServiceDefaults();
 
+builder.Configuration.AddAzureKeyVaultSecrets("secrets");
 builder.AddAzureServiceBusClient("messaging");
 builder.AddAzureTableClient("tables");
 
@@ -27,6 +28,9 @@ if (!string.IsNullOrEmpty(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_
     builder.Services.AddOpenTelemetry().UseAzureMonitor();
 }
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var configuration = builder.Configuration;
 
 var app = builder.Build();
@@ -39,14 +43,16 @@ var sampleTodos = new Todo[] {
     new(5, "Clean the car", DateOnly.FromDateTime(DateTime.Now.AddDays(2)))
 };
 
-var todosApi = app.MapGroup("/todos");
+var todosApi = app.MapGroup("/todos")
+    .WithOpenApi();
+
 todosApi.MapGet("/", () => sampleTodos);
 todosApi.MapGet("/{id}", (int id) =>
     sampleTodos.FirstOrDefault(a => a.Id == id) is { } todo
         ? Results.Ok(todo)
         : Results.NotFound());
 
-app.MapPost("/start-provisioning", async (CustomerRequest request, ServiceBusClient serviceBusClient, TableServiceClient tableServiceClient, ILogger<Program> logger) =>
+app.MapPut("/start-provisioning", async (CustomerRequest request, ServiceBusClient serviceBusClient, TableServiceClient tableServiceClient, ILogger<Program> logger) =>
 {
     var tableClient = tableServiceClient.GetTableClient("Orchestrations");
 
@@ -82,9 +88,64 @@ app.MapPost("/start-provisioning", async (CustomerRequest request, ServiceBusCli
     logger.LogInformation("Started provisioning saga with ID: {SagaId}", sagaId);
 
     return Results.Accepted();
-});
+})
+.WithOpenApi();
 
-app.MapGet("/config", (IConfiguration configuration) => configuration.AsEnumerable());
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+    
+    // Create Orchestrations & Customers tables
+    var tableServiceClient = app.Services.GetRequiredService<TableServiceClient>();
+
+    var tableClient = tableServiceClient.GetTableClient("Orchestrations");
+    await tableClient.CreateIfNotExistsAsync();
+
+    tableClient = tableServiceClient.GetTableClient("Customers");
+    await tableClient.CreateIfNotExistsAsync();
+}
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.MapGet("/config", (IConfiguration configuration) => configuration.AsEnumerable())
+.WithOpenApi();
+
+// List orchestrations endpoint
+app.MapGet("/orchestrations", async (TableServiceClient tableServiceClient) =>
+{
+    var tableClient = tableServiceClient.GetTableClient("Orchestrations");
+
+    //await tableClient.CreateAsync();
+
+    var orchestrations = new List<TableEntity>();
+
+    await foreach (var orchestration in tableClient.QueryAsync<TableEntity>())
+    {
+        orchestrations.Add(orchestration);
+    }
+
+    return orchestrations;
+})
+.WithOpenApi();
+
+// List Customers endpoint
+app.MapGet("/customers", async (TableServiceClient tableServiceClient) =>
+{
+    var tableClient = tableServiceClient.GetTableClient("Customers");
+
+    //await tableClient.CreateAsync();
+
+    var customers = new List<TableEntity>();
+
+    await foreach (var customer in tableClient.QueryAsync<TableEntity>())
+    {
+        customers.Add(customer);
+    }
+
+    return customers;
+})
+.WithOpenApi();
 
 app.MapDefaultEndpoints();
 

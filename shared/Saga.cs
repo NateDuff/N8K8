@@ -1,8 +1,18 @@
-﻿namespace N8.Shared.Saga;
+﻿using System.ComponentModel.DataAnnotations;
 
+namespace N8.Shared.Saga;
 
-public record CustomerRequest(string CustomerName, string CustomerEmail, string SubscriptionName);
+public class CustomerRequest
+{
+    [Required]
+    public string CustomerName { get; set; }
 
+    [Required]
+    public string CustomerEmail { get; set; }
+
+    [Required]
+    public string SubscriptionName { get; set; }
+}
 
 public record SagaMessage
 {

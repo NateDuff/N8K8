@@ -21,6 +21,8 @@ properties:
       - server: {{ .Env.AZURE_CONTAINER_REGISTRY_ENDPOINT }}
         identity: {{ .Env.AZURE_CONTAINER_REGISTRY_MANAGED_IDENTITY_ID }}
     secrets:
+      - name: connectionstrings--secrets
+        value: '{{ .Env.SECRETS_VAULTURI }}'
       - name: connectionstrings--tables
         value: '{{ .Env.STORAGE_TABLEENDPOINT }}'
   template:
@@ -40,6 +42,8 @@ properties:
             value: "true"
           - name: OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY
             value: in_memory
+          - name: ConnectionStrings__secrets
+            secretRef: connectionstrings--secrets
           - name: ConnectionStrings__tables
             secretRef: connectionstrings--tables
     scale:

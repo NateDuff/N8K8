@@ -15,6 +15,7 @@ public partial class SagaOrchestrator
     private readonly TableClient _orchestrationClient;
     private readonly ServiceBusClient _serviceBusClient;
     private readonly ServiceBusSender _serviceBusSender;
+    private readonly ServiceBusSender _progressBusSender;
     private readonly ILogger<SagaOrchestrator> _logger;
     private const string provisioningQueue = "newcustomer";
 
@@ -27,6 +28,7 @@ public partial class SagaOrchestrator
         _orchestrationClient = _tableServiceClient.GetTableClient("Orchestrations");
 
         _serviceBusSender = _serviceBusClient.CreateSender(provisioningQueue);
+        _progressBusSender = _serviceBusClient.CreateSender("ha");
 
         _stateMachine = new StateMachine<SagaState, SagaTrigger>(SagaState.Start);
 

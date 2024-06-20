@@ -2,7 +2,7 @@ using N8.Aspire.AppHost.Extensions;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-//Parameters
+// Parameters
 var messaging = builder.AddParameter("messaging", true);
 var envName = builder.AddParameter("environmentName");
 
@@ -23,6 +23,7 @@ var tables = builder.AddAzureStorage("storage").RunAsEmulator(container =>
 var api = builder.AddProject<Projects.N8_API>("n8-api")
     .WithAppInsights(appInsightsConnection)
     .WithReference(tables)
+    .WithReference(secrets)
     .WithExternalHttpEndpoints();
 
 builder.AddProject<Projects.N8_Web>("n8-web")

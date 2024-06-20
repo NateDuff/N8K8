@@ -1,0 +1,46 @@
+﻿@using Azure.Messaging.ServiceBus
+@using N8.Shared
+@using System.Text
+@using System.Text.Json
+@using System.Text.Json.Serialization
+
+@rendermode InteractiveServer
+
+@inject ServiceBusClient MessagingService
+
+<EditForm Model="messageModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="max-w-lg ml-8">
+        <label for="messageInput" class="block text-sm font-medium leading-6 text-gray-900">Message</label>
+        <div class="relative mt-2 rounded-md shadow-sm">
+            <InputText type="text" name="messageInput" id="messageInput" class="formInput peer" placeholder="Example message to send to Azure Service Bus" aria-invalid="true" aria-describedby="email-error" @bind-Value="@messageModel.Message" />
+
+            <div class="invisible peer-[.invalid]:visible pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                </svg>
+            </div>
+        </div>
+
+        <p class="mt-2 text-sm text-red-600" id="email-error">
+            <ValidationMessage For="@(() => messageModel.Message)" />
+        </p>
+    </div>
+
+    <button type="submit" class="rounded-md bg-osGreen-400 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-osLightGreen-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Send</button>
+</EditForm>
+
+@code {
+    private MessageModel messageModel = new MessageModel();
+
+    private async Task HandleValidSubmit()
+    {
+        var sender = MessagingService.CreateSender("ha");
+
+        await sender.SendMessageAsync(new ServiceBusMessage(messageModel.Message));
+        Console.WriteLine("Message sent!");
+
+        messageModel = new MessageModel();
+    }
+}

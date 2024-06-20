@@ -1,0 +1,35 @@
+﻿@using N8.Shared
+
+@inject IHttpClientFactory HttpClientFactory
+
+<h2 class="text-3xl font-bold tracking-tight text-center text-osBlue-400 sm:text-6xl">API</h2>
+
+<p>
+    <button @onclick=LoadToDos type="button" class="rounded-md bg-osGreen-400 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-osLightGreen-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Load ToDos from API</button>
+</p>
+
+@if (todos != null)
+{
+    <ul class="pl-8 list-disc list-inside">
+        @foreach (var todo in todos)
+        {
+            <li class="even:text-osPurple-400">@todo.Title</li>
+        }
+    </ul>
+}
+
+@code {
+    private Todo[]? todos;
+
+    // Call ToDo API
+    private async Task LoadToDos()
+    {
+        var httpClient = HttpClientFactory.CreateClient("API");
+
+        var response = await httpClient.GetFromJsonAsync<Todo[]>("/todos");
+
+        Console.WriteLine(response);
+
+        todos = response;
+    }
+}

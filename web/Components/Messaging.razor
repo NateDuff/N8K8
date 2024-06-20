@@ -79,7 +79,7 @@
 
         hubConnection.On<string, string, DateTime>("ReceiveMessage", (user, message, time) =>
         {
-            messages.Add((user, message, time));
+            messages.Insert(0, (user, message, time));
             InvokeAsync(StateHasChanged);
         });
 

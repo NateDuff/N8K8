@@ -1,6 +1,7 @@
 using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Microsoft.AspNetCore.ResponseCompression;
 using N8.Web.Hubs.Hubs;
+using N8.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,7 @@ builder.Services.AddResponseCompression(opts =>
 builder.Services.AddHttpClient("API", client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ApiEndpoint"]);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 
 builder.Configuration.AddAzureKeyVaultSecrets("secrets");
@@ -31,6 +33,7 @@ if (!string.IsNullOrEmpty(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_
     builder.Services.AddOpenTelemetry().UseAzureMonitor();
 }
 //builder.Services.AddSingleton<MessageQueueService>();
+builder.Services.AddSingleton<ServiceBusListenerService>();
 
 var app = builder.Build();
 
@@ -69,5 +72,9 @@ app.MapDefaultEndpoints();
 
 app.MapRazorComponents<N8.Web.Components.App>()
     .AddInteractiveServerRenderMode();
+
+var serviceBusListenerService = app.Services.GetRequiredService<ServiceBusListenerService>();
+
+serviceBusListenerService.StartAsync("ha").GetAwaiter().GetResult();
 
 app.Run();
