@@ -24,9 +24,10 @@ public partial class SagaOrchestrator
         // Your logic to create customer
         _stateMachine.Fire(SagaTrigger.CreateCustomer);
         orchestration["Status"] = _stateMachine.State.ToString();
-        await UpdateOrchestrationAsync(orchestration, cancellationToken: cancellationToken);
 
         await _progressBusSender.SendMessageAsync(new ServiceBusMessage("Step 1: Customer Record Created"), cancellationToken: cancellationToken);
+
+        await UpdateOrchestrationAsync(orchestration, cancellationToken: cancellationToken);
     }
 
     private async Task ProcessCreateSubscriptionAsync(TableEntity orchestration, CancellationToken cancellationToken = default)
@@ -34,9 +35,10 @@ public partial class SagaOrchestrator
         // Your logic to create subscription
         _stateMachine.Fire(SagaTrigger.CreateSubscription);
         orchestration["Status"] = _stateMachine.State.ToString();
-        await UpdateOrchestrationAsync(orchestration, cancellationToken: cancellationToken);
 
         await _progressBusSender.SendMessageAsync(new ServiceBusMessage("Step 2: Customer Subscription Created"), cancellationToken: cancellationToken);
+
+        await UpdateOrchestrationAsync(orchestration, cancellationToken: cancellationToken);
     }
 
     private async Task ProcessStartPipelineAndSendEmailAsync(TableEntity orchestration, CancellationToken cancellationToken = default)
@@ -90,8 +92,9 @@ public partial class SagaOrchestrator
         // Your logic to close request
         _stateMachine.Fire(SagaTrigger.Close);
         orchestration["Status"] = _stateMachine.State.ToString();
-        await UpdateOrchestrationAsync(orchestration, cancellationToken: cancellationToken);
 
         await _progressBusSender.SendMessageAsync(new ServiceBusMessage("Step 4: Orchestration Complete"), cancellationToken: cancellationToken);
+
+        await UpdateOrchestrationAsync(orchestration, cancellationToken: cancellationToken);
     }
 }

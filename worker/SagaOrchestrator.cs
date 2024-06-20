@@ -102,8 +102,12 @@ public partial class SagaOrchestrator
                     await ProcessCloseRequestAsync(orchestration, cancellationToken: cancellationToken);
                     break;
 
+                case SagaState.Closed:
+                    _logger.LogInformation("Saga is already closed.");
+                    break;
+
                 default:
-                    _logger.LogError("Invalid saga state {State}.", nameof(_stateMachine.State));
+                    _logger.LogError("Invalid saga state {State}.", _stateMachine.State);
                     throw new InvalidOperationException("Invalid saga state.");
             }
         }
@@ -122,7 +126,7 @@ public partial class SagaOrchestrator
     {
         await _orchestrationClient.UpdateEntityAsync(orchestration, ETag.All, TableUpdateMode.Replace, cancellationToken: cancellationToken);
 
-        if (_stateMachine.State == SagaState.Closed)
+        if ((string)orchestration["Status"] == SagaState.Closed.ToString())
         {
             return;
         }
