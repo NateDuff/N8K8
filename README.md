@@ -11,6 +11,9 @@
 ## Install Aspire workload (update if necessary with dotnet workload update)
 dotnet workload install aspire
 
+## Install AZD CLI
+winget install microsoft.azd
+
 ## Restore packages
 dotnet restore
 

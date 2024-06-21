@@ -8,3 +8,5 @@ services:
     host: containerapp
 infra:
   path: .infrastructure
+pipeline: 
+  provider: azdo

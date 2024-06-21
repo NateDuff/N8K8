@@ -1,0 +1,26 @@
+# INNOVATION DAY 2
+
+✔ Configure AZD for Container Apps deployment @done(24-06-21 05:18)
+    ✔ Try azd synth for auto generation of bicep files @done(24-06-21 05:18)
+    ✔ Update trash bicep files @done(24-06-21 05:18)
+    ✔ Aspire tweaks for optimal bicep generation @done(24-06-21 05:18)
+
+✔ Stateless Saga impelementation @done(24-06-21 05:18)
+    ✔ Implement the Stateless library - https://github.com/dotnet-state-machine/stateless @done(24-06-21 05:18)
+    ✔ Create Orchestrator @done(24-06-21 05:18)
+    ✔ Create Activities @done(24-06-21 05:18)
+    ✔ Create Sagas @done(24-06-21 05:18)
+    ✔ Integrate Azure Service Bus @done(24-06-21 05:18)
+
+✔ Frontend updates @done(24-06-21 05:21)
+    ✔ Form input validation & styling @done(24-06-21 05:21)
+    ✔ TODO list for the day @done(24-06-21 05:21)
+    ✔ Update blazor to relay service bus messages to signalR @done(24-06-21 05:21)
+
+☐ Configure aspire/aspir8 for k8s deployment
+    ✔ Quick deploy with hard coded config @done(24-06-21 05:22)
+    ☐ Figure out secrets management
+    ☐ Create bicep infrastructure for cluster
+        ☐ Bonus points for kubeconfig bicep generation https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-bicep-extensibility-kubernetes-provider
+
+✔ Deploy to AKS @done(24-06-21 05:10)
