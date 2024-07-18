@@ -1,11 +1,7 @@
-@description('The name of the Managed Cluster resource.')
-param clusterName string = 'aks101cluster'
+param applicationName string
 
 @description('The location of the Managed Cluster resource.')
 param location string = resourceGroup().location
-
-@description('Optional DNS prefix to use with hosted Kubernetes API server FQDN.')
-param dnsPrefix string
 
 @description('Disk size (in GB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agentVMSize.')
 @minValue(0)
@@ -20,19 +16,14 @@ param agentCount int = 1
 @description('The size of the Virtual Machine.')
 param agentVMSize string = 'Standard_A2_v2'
 
-@description('User name for the Linux Virtual Machines.')
-param linuxAdminUsername string
-
-@description('Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example \'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm\'')
-param sshRSAPublicKey string
-
 param msiResourceId string
 param msiClientId string
 param msiObjectId string
-param infraResourceGroupName string
 
-resource aks 'Microsoft.ContainerService/managedClusters@2024-02-01' = {
-  name: clusterName
+param logAnalyticsWorkspaceResourceID string
+
+resource aks 'Microsoft.ContainerService/managedClusters@2024-03-02-preview' = {
+  name: 'aks-${applicationName}'
   location: location
   identity: {
     type: 'UserAssigned'
@@ -45,7 +36,8 @@ resource aks 'Microsoft.ContainerService/managedClusters@2024-02-01' = {
     tier: 'Free'
   }
   properties: {
-    dnsPrefix: dnsPrefix
+    supportPlan: 'KubernetesOfficial'
+    dnsPrefix: 'aks-${applicationName}-dns'
     agentPoolProfiles: [
       {
         name: 'agentpool'
@@ -53,20 +45,19 @@ resource aks 'Microsoft.ContainerService/managedClusters@2024-02-01' = {
         count: agentCount
         vmSize: agentVMSize
         osType: 'Linux'
+        osSKU: 'Ubuntu'
         mode: 'System'
+        minCount: 2
+        maxCount: 3
+        maxPods: 110
+        enableAutoScaling: true
       }
     ]
-    nodeResourceGroup: infraResourceGroupName
-    linuxProfile: {
-      adminUsername: linuxAdminUsername
-      ssh: {
-        publicKeys: [
-          {
-            keyData: sshRSAPublicKey
-          }
-        ]
-      }
+    oidcIssuerProfile: {
+      enabled: true
     }
+    disableLocalAccounts: true
+    nodeResourceGroup: 'rg-${applicationName}-nodes'
     enableRBAC: true
     aadProfile: {
       managed: true
@@ -74,12 +65,48 @@ resource aks 'Microsoft.ContainerService/managedClusters@2024-02-01' = {
       adminGroupObjectIDs: [
         '25869ba3-c562-48d0-99e0-a331610cafdf'
       ]
+      tenantID: tenant().tenantId
+    }
+    servicePrincipalProfile: {
+      clientId: 'msi'
+    }
+    azureMonitorProfile: {
+      containerInsights: {
+        enabled: true
+        logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceID
+      }
+    }
+    networkProfile: {
+      networkPlugin: 'azure'
+      networkDataplane: 'azure'
+      loadBalancerSku: 'standard'
+      serviceCidr: '10.0.0.0/16'
+      dnsServiceIP: '10.0.0.10'
     }
     identityProfile: {
       kubeletidentity: {
         resourceId: msiResourceId
         clientId: msiClientId
         objectId: msiObjectId
+      }
+    }
+    windowsProfile: {
+      adminUsername: 'azureuser'
+      enableCSIProxy: true
+    }
+    addonProfiles: {
+      aciConnectorLinux: {
+        enabled: true
+        config: {
+          subnetName: 'virtual-node-aci'
+        }
+      }
+      omsAgent: {
+        enabled: true
+        config: {
+          logAnalyticsWorkspaceResourceID: logAnalyticsWorkspaceResourceID
+          useAADAuth: 'true'
+        }
       }
     }
   }

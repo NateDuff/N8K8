@@ -1,0 +1,35 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8-web
+  labels:
+    app: n8-web
+spec:
+  minReadySeconds: 60
+  replicas: 1
+  selector:
+    matchLabels:
+      app: n8-web
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: n8-web
+    spec:
+      containers:
+      - name: n8-web
+        image: acrn8k8.azurecr.io/n8-web:latest
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 8080
+        - name: https
+          containerPort: 8443
+        envFrom:
+        - configMapRef:
+            name: n8-web-env
+        - secretRef:
+            name: n8-web-secrets
+      terminationGracePeriodSeconds: 180

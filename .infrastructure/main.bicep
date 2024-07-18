@@ -36,6 +36,24 @@ module resources 'resources.bicep' = {
   }
 }
 
+resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
+  scope: rg
+  name: 'mi-${environmentName}'
+}
+
+module kubernetes './templates/aks-managed-cluster.bicep' = {
+  scope: rg
+  name: 'kubernetes'
+  params: {
+    applicationName: environmentName
+    location: location
+    msiClientId: managedIdentity.properties.clientId
+    msiObjectId: managedIdentity.properties.principalId
+    msiResourceId: managedIdentity.id
+    logAnalyticsWorkspaceResourceID: law.outputs.logAnalyticsWorkspaceId
+  }
+}
+
 module ai 'ai/app-insights.bicep' = {
   name: 'ai'
   scope: rg
@@ -46,14 +64,14 @@ module ai 'ai/app-insights.bicep' = {
   }
 }
 
-// module law 'law/law.bicep' = {
-//   name: 'law'
-//   scope: rg
-//   params: {
-//     environmentName: environmentName
-//     location: location
-//   }
-// }
+module law 'law/law.bicep' = {
+  name: 'law'
+  scope: rg
+  params: {
+    environmentName: environmentName
+    location: location
+  }
+}
 
 module secrets 'secrets/secrets.module.bicep' = {
   name: 'secrets'

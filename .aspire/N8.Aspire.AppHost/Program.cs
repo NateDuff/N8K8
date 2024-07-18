@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Hosting;
 using N8.Aspire.AppHost.Extensions;
 
 var builder = DistributedApplication.CreateBuilder(args);
@@ -7,8 +8,6 @@ var messaging = builder.AddParameter("messaging", true);
 var envName = builder.AddParameter("environmentName");
 
 // Services
-var appInsightsConnection = builder.AddBicepAppInsightsTemplate(envName);
-
 var secrets = builder.ExecutionContext.IsPublishMode
     ? builder.AddAzureKeyVault("secrets")
         .WithParameter("messaging", messaging)
@@ -21,21 +20,27 @@ var tables = builder.AddAzureStorage("storage").RunAsEmulator(container =>
 
 // Projects
 var api = builder.AddProject<Projects.N8_API>("n8-api")
-    .WithAppInsights(appInsightsConnection)
     .WithReference(tables)
     .WithReference(secrets)
     .WithExternalHttpEndpoints();
 
-builder.AddProject<Projects.N8_Web>("n8-web")
-    .WithAppInsights(appInsightsConnection)
+var web = builder.AddProject<Projects.N8_Web>("n8-web")
     .WithReference(secrets)
     .WithReference(api)
     .WithReference(tables)
     .WithExternalHttpEndpoints();
 
-builder.AddProject<Projects.N8_Worker>("n8-worker")
-    .WithAppInsights(appInsightsConnection)
+var worker = builder.AddProject<Projects.N8_Worker>("n8-worker")
     .WithReference(secrets)
     .WithReference(tables);
+
+if (builder.Environment.IsProduction())
+{
+    var appInsightsConnection = builder.AddBicepAppInsightsTemplate(envName);
+
+    api.WithAppInsights(appInsightsConnection);
+    web.WithAppInsights(appInsightsConnection);
+    worker.WithAppInsights(appInsightsConnection);
+}
 
 builder.Build().Run();

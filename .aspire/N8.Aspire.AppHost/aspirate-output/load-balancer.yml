@@ -1,0 +1,50 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: n8-aspire-lb
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 18888
+  - name: otlp
+    port: 18889
+    targetPort: 18889
+  selector:
+    app: aspire-dashboard
+  type: LoadBalancer
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: n8-web-lb
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  - name: https
+    port: 443
+    targetPort: 8443
+  selector:
+    app: n8-web
+  type: LoadBalancer
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: n8-api-lb
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  - name: https
+    port: 443
+    targetPort: 8443
+  selector:
+    app: n8-api
+  type: LoadBalancer

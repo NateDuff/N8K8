@@ -16,11 +16,17 @@ kubectl apply -f ./.k8s/worker-deployment.yaml
 
 # azd up
 
-# aspirate generate --output-format helm
+# Steps roughly from here: https://github.com/devkimchi/aspir8-from-scratch
+# docker login --------.azurecr.io -u acrn8k8 -p --------
+
+# aspirate init -cr -----.azurecr.io -ct latest
+# aspirate generate --image-pull-policy Always
+# aspirate apply -k aks-n8k8 --non-interactive
+
+
 # aspirate build
 
 # aspirate start
 # aspirate stop
 
-# helm upgrade demo .\aspirate-output\Chart\ --install --namespace aspire-demo --create-namespace --wait
-# helm uninstall demo --namespace aspire-demo
+

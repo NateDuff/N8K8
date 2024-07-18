@@ -1,0 +1,11 @@
+resources:
+- n8-api
+- n8-web
+- n8-worker
+- dashboard.yaml
+- load-balancer.yml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+

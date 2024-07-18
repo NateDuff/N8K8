@@ -1,0 +1,38 @@
+{
+  "projectPath": ".",
+  "inputPath": "aspirate-output",
+  "outputPath": "aspirate-output",
+  "containerRegistry": "acrn8k8.azurecr.io",
+  "containerImageTags": [
+    "latest"
+  ],
+  "imagePullPolicy": "Always",
+  "containerBuilder": "docker",
+  "kubeContext": "aks-n8k8s",
+  "outputFormat": "helm",
+  "skipFinalKustomizeGeneration": false,
+  "privateRegistryEmail": "aspir8@aka.ms",
+  "includeDashboard": true,
+  "useCustomNamespace": false,
+  "secrets": {
+    "salt": "UNWJGMZD4LVJfiPE",
+    "hash": "B2YV0KZMVBTeLH7xqm/\u002BEOuAY2IrDokBDPro6/KiCdA=",
+    "secrets": {
+      "messaging": {
+        "value": "UNWJGMZD4LVJfiPEzV2cHgR2V/2E0LxRd8ZAwaNPeno="
+      },
+      "n8-api": {
+        "ConnectionStrings__tables": "UNWJGMZD4LVJfiPEebrKBs4f7OvQvXM9ivhOqukOPSHTHg14hokA1f/rHWJwFIdZa7jfO8oRJiyfZRo=",
+        "ConnectionStrings__secrets": "UNWJGMZD4LVJfiPER8yuGzCaWBMGroVMx6QLyekOLC3TGh5uhoUaz\u002BH7CmU3D4hoc6/zO8kc"
+      },
+      "n8-web": {
+        "ConnectionStrings__secrets": "UNWJGMZD4LVJfiPER8yuGzCaWBMGroVMx6QLyekOLC3TGh5uhoUaz\u002BH7CmU3D4hoc6/zO8kc",
+        "ConnectionStrings__tables": "UNWJGMZD4LVJfiPEebrKBs4f7OvQvXM9ivhOqukOPSHTHg14hokA1f/rHWJwFIdZa7jfO8oRJiyfZRo="
+      },
+      "n8-worker": {
+        "ConnectionStrings__secrets": "UNWJGMZD4LVJfiPER8yuGzCaWBMGroVMx6QLyekOLC3TGh5uhoUaz\u002BH7CmU3D4hoc6/zO8kc",
+        "ConnectionStrings__tables": "UNWJGMZD4LVJfiPEebrKBs4f7OvQvXM9ivhOqukOPSHTHg14hokA1f/rHWJwFIdZa7jfO8oRJiyfZRo="
+      }
+    }
+  }
+}

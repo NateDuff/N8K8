@@ -1,0 +1,30 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8-worker
+  labels:
+    app: n8-worker
+spec:
+  minReadySeconds: 60
+  replicas: 1
+  selector:
+    matchLabels:
+      app: n8-worker
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: n8-worker
+    spec:
+      containers:
+      - name: n8-worker
+        image: acrn8k8.azurecr.io/n8-worker:latest
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: n8-worker-env
+        - secretRef:
+            name: n8-worker-secrets
+      terminationGracePeriodSeconds: 180
